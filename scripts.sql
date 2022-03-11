@@ -410,13 +410,14 @@ SELECT a.first,
 	a.yearid AS AL_year,
 	a.lgid AS AL_award,
 	b.yearid AS NL_year,
-	b.lgid AS NL_award
--- 	t.name
+	b.lgid AS NL_award,
+	t.name
 FROM a
 INNER JOIN b 
 ON a.playerid = b.playerid
--- JOIN managers as m
--- ON m.playerid = a.playerid
--- JOIN teams as t
--- ON t.teamid = m.teamid
-
+JOIN managers as m
+ON m.playerid = a.playerid
+JOIN teams as t
+ON t.teamid = m.teamid
+GROUP BY CUBE (a.first, a.last, a.yearid, AL_award, NL_year, NL_award, t.name)
+ORDER BY nl_year
