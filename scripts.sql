@@ -15,38 +15,39 @@ FROM allstarfull
 ORDER BY yearid;
 -- 1933-2016
 
--- ANSWERS No. 1
+-- Q1What range of years for baseball games played does the provided database cover?
 SELECT DISTINCT yearID
 FROM appearances
 ORDER BY yearid;
--- 1871-2016
+-- ANSWER: 1871-2016
 
---ANSWER 2a
-SELECT namegiven,
-	height,
-	birthyear,
-	birthmonth,
-	birthday
-FROM people
-ORDER BY height;
---"Edward Carl"	 HEIGHT:43in tall  Bday: 1925-06-08
+-- Q2 Find the name and height of the shortest player in the database. How many games did he play in? What is the name of the team for which he played?
+-- ANSWER 2a
+-- SELECT namegiven,
+-- 	height,
+-- 	birthyear,
+-- 	birthmonth,
+-- 	birthday
+-- FROM people
+-- ORDER BY height;
+-- --"Edward Carl"	 HEIGHT:43in tall  Bday: 1925-06-08
 
---ANSWER 2c
-SELECT namefirst,
-	namelast,
-	namegiven,
-	height,
-	birthyear,
-	birthmonth,
-	birthday
-FROM people
-WHERE namegiven = 'Edward Carl' 
-AND height = '43'
-ORDER BY height;
+-- --ANSWER 2c
+-- SELECT namefirst,
+-- 	namelast,
+-- 	namegiven,
+-- 	height,
+-- 	birthyear,
+-- 	birthmonth,
+-- 	birthday
+-- FROM people
+-- WHERE namegiven = 'Edward Carl' 
+-- AND height = '43'
+-- ORDER BY height;
 
-SELECT * 
-FROM people 
-WHERE namegiven = 'Edward Carl';
+-- SELECT * 
+-- FROM people 
+-- WHERE namegiven = 'Edward Carl';
 
 SELECT DISTINCT namefirst,
 	namelast,
@@ -62,17 +63,17 @@ ON t.teamid = a.teamid
 WHERE namegiven = 'Edward Carl' 
 AND height = '43'
 ORDER BY height;
---ANSWER: "St. Louis Browns"
--- TEAMID: SLA
+--ANSWER: "Eddie"	"Gaedel"	"Edward Carl"	43	"SLA"	"St. Louis Browns"
 
--- ANSWER 2b
-SELECT *
-FROM teams
-WHERE teamid = 'SLA';
 
-select *
-FROM homegames
-WHERE team = 'SLA';
+-- -- ANSWER 2b
+-- SELECT *
+-- FROM teams
+-- WHERE teamid = 'SLA';
+
+-- select *
+-- FROM homegames
+-- WHERE team = 'SLA';
 
 SELECT DISTINCT namefirst,
 	namelast,
@@ -130,12 +131,12 @@ ORDER BY salary desc;
 -- "P" or "C" as "Battery".
 -- Determine the number of putouts made by each of these three groups in 2016.
 
-SELECT *
-FROM fielding;
+-- SELECT *
+-- FROM fielding;
 
-SELECT POS
-FROM fielding
-GROUP BY pos;
+-- SELECT POS
+-- FROM fielding
+-- GROUP BY pos;
 
 SELECT fieldPOS,
 SUM(SUM(PO)) OVER (PARTITION BY FieldPOS)
@@ -152,16 +153,20 @@ WHERE yearid = '2016'
 GROUP BY playerid, pos, PO
 ORDER BY POS desc) AS Subquery
 GROUP BY fieldpos;
+-- "Battery"	41412
+-- "Infield"	58926
+-- "Outfield"	29560
+
 
 -- Q 5
 -- Find the average number of strikeouts per game by decade since 1920. Round the numbers you report to 2 decimal places. Do the same for home runs per game. Do you see any trends?
-SELECT g
-FROM teams;
+-- SELECT g
+-- FROM teams;
 
-SELECT DISTINCT yearid 
-FROM TEAMS 
-ORDER BY YEARID;
---2016-1871
+-- SELECT DISTINCT yearid 
+-- FROM TEAMS 
+-- ORDER BY YEARID;
+-- --2016-1871
 
 SELECT ROUND(AVG(SO/g),2) AS SO_per_game,
 ROUND(AVG(hr/g),2) AS HR_per_game,
@@ -192,14 +197,15 @@ ORDER BY decade;
 -- 	 5.65		 0.41		"1990s"
 -- 	 6.07		 0.62		"2000s"
 -- 	 7.03		 0.44		"2010s"
+-- TREND: The SO_per_game seems to be increasing with every decade. HR_per_game increases but fluxes int he last 3 decades in the data set.
 
---Q 6 Find the player who had the most success stealing bases in 2016, where success is measured as the percentage of stolen base attempts which are successful. (A stolen base attempt results either in a stolen base or being caught stealing.) Consider only players who attempted at least 20 stolen bases.
+-- Q 6 Find the player who had the most success stealing bases in 2016, where success is measured as the percentage of stolen base attempts which are successful. (A stolen base attempt results either in a stolen base or being caught stealing.) Consider only players who attempted at least 20 stolen bases.
 
-SELECT *
-FROM people;
+-- SELECT *
+-- FROM people;
 
-SELECT * 
-FROM batting;
+-- SELECT * 
+-- FROM batting;
 
 -- SELECT namefirst, namelast
 -- FROM people
@@ -238,8 +244,6 @@ FROM teams;
 
 SELECT wswin
 FROM teams;
-
-select* from teams;
 
 SELECT yearid,
 teamid,
@@ -283,35 +287,64 @@ ORDER BY w, yearid desc;
 --  ON s.teamid = t.teamid
 -- GROUP BY t.teamid, wins_per_year, s.wswin
 -- order by winningest desc;
+select* from teams;
 
-SELECT teamid,
-count(*) as WSWIN_
-FROM teams
-WHERE wswin = 'Y'
-GROUP BY teamid;
+-- SELECT MAX(w) OVER(Partition by yearid ORDER BY wswin),
+-- yearid, 
+-- teamid,
+-- w,
+-- wswin
+-- FROM (SELECT wswin,
+-- 	  w,
+-- 	  CASE WHEN wswin = 'Y' and MAX(CAST (W as FLOAT)) THEN win_both
+-- 	WHEN wswin = 'N' and MAX(CAST (W as FLOAT)) THEN win_one
+-- 	END) AS answer
+-- 	FROM teams
+-- 	GROUP BY wswin, w, answer) as c
+-- GROUP BY yearid, teamid, w, wswin
+-- ORDER BY W desc;
 
-SELECT teamid,
-w,
-wswin,
-yearid,
-(CASE 
-	 WHEN yearid BETWEEN 1920 AND 1929 AND wswin = 'Y' THEN '1920s champ'
-	 WHEN yearid BETWEEN 1930 AND 1939 AND wswin = 'Y' THEN '1930s champ'
-	 WHEN yearid BETWEEN 1940 AND 1949 AND wswin = 'Y' THEN '1940s champ'
- 	 WHEN yearid BETWEEN 1950 AND 1959 AND wswin = 'Y' THEN '1950s champ'
-	 WHEN yearid BETWEEN 1960 AND 1969 AND wswin = 'Y' THEN '1960s champ'
-	 WHEN yearid BETWEEN 1970 AND 1979 AND wswin = 'Y' THEN '1970s champ'
-	 WHEN yearid BETWEEN 1980 AND 1989 AND wswin = 'Y' THEN '1980s champ'
-	 WHEN yearid BETWEEN 1990 AND 1999 AND wswin = 'Y' THEN '1990s champ'
-	 WHEN yearid BETWEEN 2000 AND 2009 AND wswin = 'Y' THEN '2000s champ'
-	 WHEN yearid BETWEEN 2010 AND 2019 AND wswin = 'Y' THEN '2010s champ'
-END) AS DECADE_winner
-FROM teams
-WHERE wswin IS NOT null
-AND wswin <> 'N'
-AND yearid BETWEEN 1920 AND 2016
-GROUP BY teamid, yearid, wswin, w
-ORDER BY yearid, decade_winner;
+-- SELECT teamid,
+-- w,
+-- wswin,
+-- yearid,
+-- (CASE 
+-- 	 WHEN MAX(w) AND wswin = 'Y' THEN 'champ'
+--  ELSE NULL END) as max_champ
+-- (CASE 
+-- 	 WHEN yearid BETWEEN 1920 AND 1929 AND wswin = 'Y' THEN '1920s champ'
+-- 	 WHEN yearid BETWEEN 1930 AND 1939 AND wswin = 'Y' THEN '1930s champ'
+-- 	 WHEN yearid BETWEEN 1940 AND 1949 AND wswin = 'Y' THEN '1940s champ'
+--   WHEN yearid BETWEEN 1950 AND 1959 AND wswin = 'Y' THEN '1950s champ'
+-- 	 WHEN yearid BETWEEN 1960 AND 1969 AND wswin = 'Y' THEN '1960s champ'
+-- 	 WHEN yearid BETWEEN 1970 AND 1979 AND wswin = 'Y' THEN '1970s champ'
+-- 	 WHEN yearid BETWEEN 1980 AND 1989 AND wswin = 'Y' THEN '1980s champ'
+-- 	 WHEN yearid BETWEEN 1990 AND 1999 AND wswin = 'Y' THEN '1990s champ'
+-- 	 WHEN yearid BETWEEN 2000 AND 2009 AND wswin = 'Y' THEN '2000s champ'
+-- 	 WHEN yearid BETWEEN 2010 AND 2019 AND wswin = 'Y' THEN '2010s champ'
+-- END) AS DECADE_winner
+-- FROM teams
+-- WHERE wswin IS NOT null
+-- AND wswin <> 'N'
+-- AND yearid BETWEEN 1920 AND 2016
+-- GROUP BY teamid, yearid, wswin, w
+-- ORDER BY yearid, decade_winner;
+
+SELECT fieldPOS,
+SUM(SUM(PO)) OVER (PARTITION BY FieldPOS)
+FROM 
+(SELECT playerid,
+	pos,
+	CASE WHEN pos = 'OF' THEN 'Outfield' 
+	WHEN pos IN ('SS', '1B', '2B', '3B') THEN 'Infield'
+	WHEN pos IN ('P', 'C') THEN 'Battery'
+	END AS FieldPOS,
+ 	PO
+FROM fielding
+WHERE yearid = '2016'
+GROUP BY playerid, pos, PO
+ORDER BY POS desc) AS Subquery
+GROUP BY fieldpos;
 
 -- COME BACK TO THIS ONE
 
@@ -405,19 +438,27 @@ b AS (
 	WHERE lgid = 'NL'
 	AND awardid = 'TSN Manager of the Year'
 	order by namelast, yearid)
+-- c AS (SELECT *
+-- 	  FROM teams AS T
+-- 	 LEFT JOIN managers as M
+-- 	 USING (teamid)
+	
 SELECT a.first,
 	a.last,
-	a.yearid AS AL_year,
-	a.lgid AS AL_award,
+	 a.yearid AS AL_year,
+	 a.lgid AS AL_award,
 	b.yearid AS NL_year,
 	b.lgid AS NL_award,
 	t.name
 FROM a
 INNER JOIN b 
 ON a.playerid = b.playerid
-JOIN managers as m
+LEFT JOIN managers as m
 ON m.playerid = a.playerid
-JOIN teams as t
+LEFT JOIN teams as t
 ON t.teamid = m.teamid
-GROUP BY CUBE (a.first, a.last, a.yearid, AL_award, NL_year, NL_award, t.name)
-ORDER BY nl_year
+ORDER BY nl_year;
+
+--Q 10 Find all players who hit their career highest number of home runs in 2016. Consider only players who have played in the league for at least 10 years, and who hit at least one home run in 2016. Report the players' first and last names and the number of home runs they hit in 2016.
+
+SELECT * from teams
